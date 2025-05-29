@@ -1,0 +1,27 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: student-service-route
+          uri: lb://student-service
+          predicates:
+            - Path=/api/students/**
+          filters:
+            - JwtRoleFilter=STUDENT-INSTRUCTOR
+
+
+#        Course-service
+        - id: course-service-route
+          uri: lb://course-service
+          predicates:
+            - Path=/api/courses/**
+          filters:
+            - JwtRoleFilter=INSTRUCTOR-ADMIN
+
+#        Instructor-service
+        - id: instructor-service-route
+          uri: lb://instructor-service
+          predicates:
+            - Path=/api/instructor/**
+          filters:
+            - JwtRoleFilter=INSTRUCTOR
