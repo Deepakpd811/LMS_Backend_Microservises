@@ -68,10 +68,11 @@ public class BatchService {
 
         // Fetch all students
         List<StudentDTO> allStudents = validationService.getAllStudents();
+        System.out.println(allStudents);
 
         // Filter students who belong to this batch
         List<StudentDTO> studentsInBatch = allStudents.stream()
-                .filter(student -> batch.getStudentIds().contains(student.getUserId()))
+                .filter(student -> batch.getStudentIds().contains(student.getId()))
                 .toList();
 
         return FullBatchDTO.builder()
@@ -84,6 +85,14 @@ public class BatchService {
                 .build();
     }
 
+
+    public List<BatchDTO> getAllBatchOfInstructor(Long instructorId) {
+        List<Batch> batches = batchRepository.findAllByInstructorId(instructorId);
+
+        return batches.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
 
 

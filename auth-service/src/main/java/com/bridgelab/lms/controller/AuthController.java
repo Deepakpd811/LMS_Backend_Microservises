@@ -1,22 +1,27 @@
 package com.bridgelab.lms.controller;
 
 import com.bridgelab.lms.dto.*;
+import com.bridgelab.lms.entity.Role;
 import com.bridgelab.lms.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthService authService;
-
     @Autowired
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    private  AuthService authService;
+
+//    @Autowired
+//    public AuthController(AuthService authService) {
+//        this.authService = authService;
+//    }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserDto>> register(
@@ -65,4 +70,34 @@ public class AuthController {
                 )
         );
     }
+
+//    @GetMapping("/validate")
+//    public ResponseEntity<ApiResponse> validateToken(@RequestHeader("Authorization") String authHeader){
+//
+//        if(authHeader==null || !authHeader.startsWith("Bearer ")){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//
+//        return authService.validateToken(authHeader.substring(7))
+//                ?ResponseEntity.ok(ApiResponse.success(HttpStatus.OK , "validate successfull"))
+//                :ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//
+//    }
+//
+    @GetMapping("/validate")
+    public ResponseEntity<ApiResponse> validateToken(@RequestHeader("Authorization") String authHeader,
+    @RequestBody List<String> roles){
+
+        if(authHeader==null || !authHeader.startsWith("Bearer ")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return authService.validateToken(authHeader.substring(7) , roles)
+                ?ResponseEntity.ok(ApiResponse.success(HttpStatus.OK , "validate successfull"))
+                :ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+    }
+
+
+
 }

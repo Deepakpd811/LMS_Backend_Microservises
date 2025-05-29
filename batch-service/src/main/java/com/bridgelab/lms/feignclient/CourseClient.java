@@ -13,9 +13,11 @@ import java.util.List;
 public interface CourseClient {
 
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id);
 
     @GetMapping("/instructor/{id}/courses")
-    public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id);
+    public ResponseEntity<List<CourseDto>> getCoursesByInstructorId(@PathVariable Long id);
 
 
 

@@ -4,11 +4,15 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -45,12 +49,24 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token , List<String> allowedRoles) {
         try {
-            extractClaims(token);
-            return true;
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String userRole = claims.get("role", String.class);
+
+            if (allowedRoles.contains(userRole)) {
+                return true;
+            }
+
+            return false;
         } catch (JwtException | IllegalArgumentException e) {
+            e.printStackTrace(); // Optional: helps during debugging
             return false;
         }
     }
+
 }

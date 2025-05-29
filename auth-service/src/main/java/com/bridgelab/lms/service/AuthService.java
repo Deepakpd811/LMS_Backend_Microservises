@@ -6,6 +6,7 @@ import com.bridgelab.lms.exception.*;
 import com.bridgelab.lms.feignclient.UserClient;
 import com.bridgelab.lms.util.JwtUtil;
 import com.bridgelab.lms.util.OtpUtil;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,13 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AuthService {
 
 
     private final UserClient userClient;
-    private final JwtUtil jwtUtil;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
     private final OtpUtil otpUtil;
     private final PasswordEncoder passwordEncoder;
     //private final EmailService emailService;
@@ -29,6 +34,7 @@ public class AuthService {
                        PasswordEncoder passwordEncoder) {
         this.userClient = userClient;
         this.jwtUtil = jwtUtil;
+//        this.jwtUtil = jwtUtil;
         this.otpUtil = otpUtil;
         this.passwordEncoder = passwordEncoder;
 
@@ -60,7 +66,7 @@ public class AuthService {
         UserDto createdUser = response.getBody();
 
         // Send OTP email
-       // emailService.sendOtpEmail(request.getEmail(), otp);
+        // emailService.sendOtpEmail(request.getEmail(), otp);
 
         return createdUser;
     }
@@ -68,7 +74,8 @@ public class AuthService {
     @Transactional
     public AuthResponse verifyOtp(OtpVerificationRequest request) {
         // Get user from user service
-        ResponseEntity<UserDto> userResponse = userClient.verifyUser(request);;
+        ResponseEntity<UserDto> userResponse = userClient.verifyUser(request);
+        ;
 
         UserDto user = userResponse.getBody();
 
@@ -120,6 +127,7 @@ public class AuthService {
             throw new RuntimeException("Please verify your email first");
         }
 
+
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());
 
         return AuthResponse.builder()
@@ -127,4 +135,10 @@ public class AuthService {
                 .user(user)
                 .build();
     }
+
+    public boolean validateToken(String token, List<String> roles) {
+
+        return jwtUtil.validateToken(token, roles);
+    }
+
 }

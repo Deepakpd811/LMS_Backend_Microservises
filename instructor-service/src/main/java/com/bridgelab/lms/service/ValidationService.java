@@ -2,6 +2,7 @@ package com.bridgelab.lms.service;
 
 import com.bridgelab.lms.dto.CourseDto;
 import com.bridgelab.lms.dto.UserDto;
+import com.bridgelab.lms.entity.Role;
 import com.bridgelab.lms.exception.InvalidException;
 import com.bridgelab.lms.feignclient.CourseClient;
 import com.bridgelab.lms.feignclient.UserClient;
@@ -42,6 +43,18 @@ public class ValidationService {
     public UserDto validateUserExists(Long userId) {
         try {
             UserDto userDto = userClient.getUserById(userId).getBody();
+            return userDto;
+        } catch (FeignException.NotFound | FeignException.BadRequest e) {
+            throw new InvalidException("Student/User ID " + userId + " does not exist in User Service.");
+        }
+    }
+
+    public UserDto validateInstructorExists(Long userId) {
+        try {
+            UserDto userDto = userClient.getUserById(userId).getBody();
+            if(userDto.getRole()!= Role.INSTRUCTOR) {
+                throw  new InvalidException("User id invalid");
+            }
             return userDto;
         } catch (FeignException.NotFound | FeignException.BadRequest e) {
             throw new InvalidException("Student/User ID " + userId + " does not exist in User Service.");

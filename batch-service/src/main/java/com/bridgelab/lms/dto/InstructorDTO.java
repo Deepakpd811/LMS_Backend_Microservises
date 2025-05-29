@@ -19,6 +19,7 @@ public class InstructorDTO {
     private LocalDate joinedDate;
 
     private UserDto credential; // populated via Feign client
+    @JsonIgnore
     private List<CourseDto> courseDtoList;
     // Constructors, Getters, Setters
 }

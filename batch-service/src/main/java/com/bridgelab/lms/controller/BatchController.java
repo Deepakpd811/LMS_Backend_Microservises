@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/batches")
+@RequestMapping("/api/batch")
 @RequiredArgsConstructor
 public class BatchController {
 
@@ -35,4 +35,13 @@ public class BatchController {
     public ResponseEntity<FullBatchDTO> getFullDetailById(@PathVariable Long id) {
         return ResponseEntity.ok(batchService.getFullBatchDetails(id));
     }
+    @GetMapping("/{instructorId}/batches")
+    public ResponseEntity<List<BatchDTO>> getAllBatchOfInstructor(@PathVariable Long instructorId) {
+
+        System.out.println("Fetching all instructor batches");
+
+        return ResponseEntity.ok(batchService.getAllBatchOfInstructor(instructorId));
+    }
+
+
 }

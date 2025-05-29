@@ -1,12 +1,10 @@
 package com.bridgelab.lms.service;
 
 
-import com.bridgelab.lms.dto.CourseDto;
-import com.bridgelab.lms.dto.InstructorDTO;
-import com.bridgelab.lms.dto.InstructorRequest;
-import com.bridgelab.lms.dto.UserDto;
+import com.bridgelab.lms.dto.*;
 import com.bridgelab.lms.entity.Instructor;
 import com.bridgelab.lms.exception.InvalidException;
+import com.bridgelab.lms.feignclient.BatchClient;
 import com.bridgelab.lms.feignclient.CourseClient;
 import com.bridgelab.lms.feignclient.UserClient;
 import com.bridgelab.lms.repository.InstructorRepository;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +30,17 @@ public class InstructorService  {
     private final CourseClient courseClient;
 
     @Autowired
+    private final BatchClient batchClient;
+
+    @Autowired
     private ValidationService validation;
+
 //    private final BatchClient batchClient;
 
 
     public InstructorDTO createInstructor(InstructorRequest request) {
 
-        validation.validateUserExists(request.getUserId());
+        validation.validateInstructorExists(request.getUserId());
 
         Instructor instructor = new Instructor();
 
@@ -55,7 +58,7 @@ public class InstructorService  {
         Instructor instructor = instructorRepository.findById(instructorId)
                 .orElseThrow(() -> new InvalidException("Instructor not found"));
 
-        UserDto user = validation.validateUserExists(instructor.getUserId());
+        UserDto user = validation.validateInstructorExists(instructor.getUserId());
 
         List<CourseDto> courses = validation.validateCourseExists(instructorId);
 
@@ -65,15 +68,27 @@ public class InstructorService  {
         return dto;
     }
 
-
+    // get all course of instructor
     public List<CourseDto> getCoursesByInstructor(Long instructorId) {
         return validation.validateCourseExists(instructorId);
     }
 
+    //List of instructor
+    public List<InstructorDTO> getAllInstructor() {
+        List<Instructor> instructors = instructorRepository.findAll();
 
-//    public List<BatchDTO> getBatchesByInstructor(Long instructorId) {
-//        return batchClient.getBatchesByInstructorId(instructorId);
-//    }
+        List<InstructorDTO> dtoList = instructors.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+
+        return dtoList;
+    }
+
+
+
+    public List<BatchDTO> getBatchesByInstructor(Long instructorId) {
+        return batchClient.getAllBatchOfInstructor(instructorId).getBody();
+    }
 
 
 //    public MentorshipStatsDTO getMentorshipStats(Long instructorId) {
