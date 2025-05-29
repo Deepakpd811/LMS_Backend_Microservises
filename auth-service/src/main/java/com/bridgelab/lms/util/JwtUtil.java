@@ -3,6 +3,7 @@ package com.bridgelab.lms.util;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -57,6 +59,8 @@ public class JwtUtil {
                     .getBody();
 
             String userRole = claims.get("role", String.class);
+            log.info("User role in claims validation token {}", userRole);
+            log.info("User allowed role in claims validation token {}", allowedRoles);
 
             if (allowedRoles.contains(userRole)) {
                 return true;

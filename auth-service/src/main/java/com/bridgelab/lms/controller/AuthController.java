@@ -84,7 +84,8 @@ public class AuthController {
 //
 //    }
 //
-    @GetMapping("/validate")
+
+    @PostMapping("/validate")
     public ResponseEntity<ApiResponse> validateToken(@RequestHeader("Authorization") String authHeader,
     @RequestBody List<String> roles){
 
